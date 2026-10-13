@@ -52,7 +52,7 @@ export default function Home() {
           priority
           className="object-cover object-center -z-10"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10 -z-10" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,_var(--tw-gradient-stops))] from-yellow-800/60 via-red-800/40 to-maroon-600/80 -z-10" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 w-full py-28">
           <p className="text-sm font-medium text-maroon-100/80">Karen, Nairobi · sdackc.org</p>
