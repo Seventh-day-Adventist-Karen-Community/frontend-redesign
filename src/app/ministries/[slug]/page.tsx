@@ -10,8 +10,15 @@ export function generateStaticParams() {
   return ministries.map((m) => ({ slug: m.slug }));
 }
 
-export default function MinistryDetailPage({ params }: { params: { slug: string } }) {
-  const ministry = ministries.find((m) => m.slug === params.slug);
+// In Next.js 15+, `params` is a Promise and must be awaited before use.
+// Awaiting it is also harmless on Next 14, where it's a plain object.
+export default async function MinistryDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const ministry = ministries.find((m) => m.slug === slug);
   if (!ministry) notFound();
 
   const relatedEvents = events.filter((e) => e.department === ministry.name);
@@ -19,7 +26,7 @@ export default function MinistryDetailPage({ params }: { params: { slug: string 
   return (
     <div>
       <PageHero
-        eyebrow={`${ministry.emoji} Ministry`}
+        eyebrow={`Ministry · ${ministry.audience}`}
         title={ministry.name}
         description={ministry.summary}
       />

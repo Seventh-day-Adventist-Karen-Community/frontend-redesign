@@ -8,6 +8,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        cream: "#FDF6F0",
+        gold: "#B8863B",
         maroon: {
           50: "#FBEEF0",
           100: "#F5D6DA",

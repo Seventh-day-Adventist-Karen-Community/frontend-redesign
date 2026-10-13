@@ -20,6 +20,9 @@ const NAV_LINKS = [
 // everywhere except the plain legal pages, which have no hero to sit on.
 const isHeroPath = (pathname: string) => !pathname.startsWith("/legal");
 
+const isActive = (pathname: string, href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
+
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -39,92 +42,144 @@ const Header = () => {
     setOpen(false);
   }, [pathname]);
 
-  const transparent = isHeroRoute && !scrolled && !open;
+  // While the full-screen menu is open: lock page scroll and let Escape close it.
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  const transparent = isHeroRoute && !scrolled;
 
   return (
-    <header
-      className={`${isHeroRoute ? "fixed" : "sticky"} top-0 inset-x-0 z-40 transition-colors duration-300 ${
-        transparent
-          ? "bg-transparent"
-          : "bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm"
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-        <Link href="/" className="shrink-0">
-          <Image
-            src={transparent ? "/logo.svg" : "/logo_maroon.svg"}
-            alt="Karen Community Church"
-            width={465}
-            height={160}
-            priority
-            className="h-8 sm:h-9 w-auto transition-opacity"
-          />
-        </Link>
+    <>
+      <header
+        className={`${isHeroRoute ? "fixed" : "sticky"} top-0 inset-x-0 z-40 transition-colors duration-300 ${
+          transparent
+            ? "bg-transparent"
+            : "bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm"
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="shrink-0">
+            <Image
+              src={transparent ? "/logo.svg" : "/logo_maroon.svg"}
+              alt="Karen Community Church"
+              width={465}
+              height={160}
+              priority
+              className="h-8 sm:h-9 w-auto transition-opacity"
+            />
+          </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors ${
+                  transparent
+                    ? "text-white/90 hover:text-white"
+                    : "text-gray-700 hover:text-maroon-600"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-3">
             <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-medium transition-colors ${
+              href="/live"
+              className={`hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full transition-colors ${
                 transparent
-                  ? "text-white/90 hover:text-white"
-                  : "text-gray-700 hover:text-maroon-600"
+                  ? "bg-white/15 border border-white/40 text-white hover:bg-white/25"
+                  : "bg-maroon-600 hover:bg-maroon-700 text-white"
               }`}
             >
-              {link.label}
+              <Radio size={15} />
+              Live
             </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/live"
-            className={`hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full transition-colors ${
-              transparent
-                ? "bg-white/15 border border-white/40 text-white hover:bg-white/25"
-                : "bg-maroon-600 hover:bg-maroon-700 text-white"
-            }`}
-          >
-            <Radio size={15} />
-            Live
-          </Link>
-          <button
-            type="button"
-            aria-label="Toggle menu"
-            onClick={() => setOpen((v) => !v)}
-            className={`md:hidden p-2 -mr-2 transition-colors ${
-              transparent ? "text-white" : "text-gray-700"
-            }`}
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <nav className="md:hidden border-t border-gray-100 px-4 sm:px-6 py-3 flex flex-col gap-1 bg-white">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              className="py-2 text-sm font-medium text-gray-700 hover:text-maroon-600"
+            <button
+              type="button"
+              aria-label="Open menu"
+              aria-expanded={open}
+              onClick={() => setOpen(true)}
+              className={`md:hidden p-2 -mr-2 transition-colors ${
+                transparent ? "text-white" : "text-gray-700"
+              }`}
             >
-              {link.label}
+              <Menu size={26} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Full-screen mobile menu. Rendered outside <header> on purpose: the
+          header's backdrop-blur would otherwise become the containing block
+          for this fixed overlay and stop it covering the whole viewport. */}
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
+          className="md:hidden fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-maroon-900 via-maroon-800 to-maroon-900 text-white"
+        >
+          <div className="h-16 px-4 flex items-center justify-between shrink-0">
+            <Link href="/" onClick={() => setOpen(false)} className="shrink-0">
+              <Image
+                src="/logo.svg"
+                alt="Karen Community Church"
+                width={465}
+                height={160}
+                className="h-8 w-auto"
+              />
             </Link>
-          ))}
-          <Link
-            href="/live"
-            onClick={() => setOpen(false)}
-            className="mt-2 inline-flex items-center justify-center gap-1.5 bg-maroon-600 text-white text-sm font-semibold px-4 py-2 rounded-full"
-          >
-            <Radio size={15} />
-            Live
-          </Link>
-        </nav>
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+              className="p-2 -mr-2 text-white"
+            >
+              <X size={28} />
+            </button>
+          </div>
+
+          <nav className="flex-1 flex flex-col items-center justify-center gap-7 px-6 pb-16 overflow-y-auto">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className={`font-serif text-4xl text-center transition-colors ${
+                  isActive(pathname, link.href)
+                    ? "text-white underline decoration-maroon-300 decoration-2 underline-offset-8"
+                    : "text-white/75 hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/live"
+              onClick={() => setOpen(false)}
+              className="mt-4 inline-flex items-center gap-2 bg-white text-maroon-700 text-xl font-semibold px-10 py-3.5 rounded-full hover:bg-maroon-50 transition-colors"
+            >
+              <Radio size={20} />
+              Live
+            </Link>
+          </nav>
+        </div>
       )}
-    </header>
+    </>
   );
 };
 

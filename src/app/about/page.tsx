@@ -1,5 +1,7 @@
 import { MapPin } from "lucide-react";
 import PageHero from "@/components/PageHero";
+import LocationMap from "@/components/LocationMap";
+import { directionsUrl, location } from "@/data/location";
 
 const COMMITTEE = [
   { name: "Elder James Mwangi", role: "Head Elder" },
@@ -39,13 +41,19 @@ export default function AboutPage() {
         </div>
 
         <h2 className="font-serif text-2xl mt-12 mb-5">Visit Us</h2>
-        <div className="rounded-2xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center text-gray-400 text-sm">
-          Map placeholder
-        </div>
+        <LocationMap className="aspect-video" />
         <p className="text-gray-600 mt-4 flex items-center gap-2">
           <MapPin size={16} className="text-maroon-600" />
-          Karen, Nairobi, Kenya
+          {location.name} · {location.area}
         </p>
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 mt-4 bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
+        >
+          <MapPin size={16} /> Get directions
+        </a>
 
         <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200 max-w-sm">
           {[

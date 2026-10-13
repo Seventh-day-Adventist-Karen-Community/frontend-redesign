@@ -1,5 +1,93 @@
-node_modules
-.next
-out
+# ==========================================
+# Dependencies
+# ==========================================
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.json
+
+# ==========================================
+# Next.js Build & Output
+# ==========================================
+/.next/
+/out/
+
+# ==========================================
+# Production & Server Outputs
+# ==========================================
+/build
+/dist
+
+# ==========================================
+# Debug & Log Files
+# ==========================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+# ==========================================
+# Local Environment Variables
+# ==========================================
+# Do NOT commit sensitive API keys or secrets
+.env
 .env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Allow committing environment templates/example files
+!.env.example
+!.env.sample
+
+# ==========================================
+# Vercel & Deployment Tooling
+# ==========================================
+.vercel
+
+# ==========================================
+# Testing & Code Coverage
+# ==========================================
+/coverage
+/.nyc_output
+/cypress/videos
+/cypress/screenshots
+/.playwright
+/test-results
+
+# ==========================================
+# IDEs & Editor Configurations
+# ==========================================
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains / IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# macOS / Windows OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================================
+# Cache & Temporary Files
+# ==========================================
+/.turbo
+/.cache
+*.tsbuildinfo
+.eslintcache
+.stylelintcache

@@ -6,6 +6,8 @@ import MinistryCard from "@/components/MinistryCard";
 import { events } from "@/data/events";
 import { ministries } from "@/data/ministries";
 import { bulletins } from "@/data/bulletin";
+import { directionsUrl, location } from "@/data/location";
+import LocationMap from "@/components/LocationMap";
 
 const glance = [
   {
@@ -157,7 +159,7 @@ export default function Home() {
             Every member has a place to grow, serve, and belong.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
           {ministries.slice(0, 8).map((ministry) => (
             <MinistryCard key={ministry.slug} ministry={ministry} />
           ))}
@@ -215,16 +217,14 @@ export default function Home() {
       {/* Location */}
       <section className="bg-gray-50 py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-8">
-          <div className="rounded-2xl overflow-hidden bg-gray-200 aspect-video md:aspect-auto flex items-center justify-center text-gray-400 text-sm">
-            Map placeholder
-          </div>
+          <LocationMap className="aspect-video md:aspect-auto md:min-h-[320px]" />
           <div className="flex flex-col justify-center">
             <span className="text-xs font-semibold uppercase tracking-wide text-maroon-600">
               Join us
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl mt-2">Find us this Sabbath</h2>
             <p className="text-gray-500 mt-2 flex items-center gap-2">
-              <MapPin size={16} /> Karen, Nairobi
+              <MapPin size={16} /> {location.area}
             </p>
             <div className="mt-5 divide-y divide-gray-200 border-y border-gray-200 max-w-sm">
               {[
@@ -238,9 +238,19 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <Link href="/about" className="text-sm font-semibold text-maroon-700 hover:underline mt-5">
-              Directions &amp; more about us →
-            </Link>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-maroon-600 hover:bg-maroon-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
+              >
+                <MapPin size={16} /> Get directions
+              </a>
+              <Link href="/about" className="text-sm font-semibold text-maroon-700 hover:underline">
+                More about us →
+              </Link>
+            </div>
           </div>
         </div>
       </section>

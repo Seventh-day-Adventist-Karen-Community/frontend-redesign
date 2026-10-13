@@ -1,0 +1,1 @@
+Drop ministry photos here as <slug>.jpg (e.g. children.jpg), then set `image: "/ministries/children.jpg"` on that ministry in src/data/ministries.ts. Until then, cards show the church photo under a maroon wash with the ministry's icon.
