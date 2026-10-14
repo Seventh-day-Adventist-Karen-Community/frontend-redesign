@@ -61,3 +61,18 @@ src/
   period).
 - The PDFs in `public/bulletins/` are generated samples — replace them with
   the real files.
+
+## Ministries: sections, classes, pictures and emblems
+
+Any ministry can have `groups` (sections with their own page), and any group
+can have `classes`. Examples in `src/data/ministries.ts`:
+
+- Clubs -> Adventurers (Little Lamb ... Helping Hand), Pathfinders (Friend ...
+  Guide), Master Guides
+- Children's Ministry -> Kids in Discipleship (KID), Alive in Jesus
+  (Beginner, Kindergarten, Primary, Junior, Earliteen)
+- Music & Praise Team -> Praise Team, Church Choir, Instrumentalists
+
+Ministries, groups and classes all accept an optional `image`, and groups and
+classes accept an `emblem`. See `public/ministries/README.txt`. The age ranges
+and class lists are draft content - confirm them with each department.

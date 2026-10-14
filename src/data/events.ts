@@ -58,7 +58,7 @@ export const events: Event[] = [
     date: "2026-11-28",
     time: "Fri 3:00 PM – Sun 12:00 PM",
     location: "Karura Forest Campsite",
-    department: "Pathfinders & Adventurers",
+    department: "Clubs",
   },
   {
     slug: "vespers-young-adults",

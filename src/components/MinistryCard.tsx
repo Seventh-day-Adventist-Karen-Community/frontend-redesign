@@ -68,7 +68,17 @@ const MinistryCard = ({ ministry }: { ministry: Ministry }) => {
       <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-gold">
         {ministry.audience}
       </p>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-gray-500">{ministry.summary}</p>
+      <p className="mt-2 text-sm leading-relaxed text-gray-500">{ministry.summary}</p>
+      <div className="mt-3 flex flex-1 flex-wrap content-start gap-1.5">
+        {ministry.groups?.map((group) => (
+          <span
+            key={group.slug}
+            className="rounded-full bg-maroon-50 px-2.5 py-1 text-[11px] font-medium text-maroon-700"
+          >
+            {group.name}
+          </span>
+        ))}
+      </div>
 
       <Link
         href={href}
