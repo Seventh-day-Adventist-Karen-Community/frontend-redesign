@@ -14,7 +14,7 @@ export default function LivePage() {
         description={
           IS_LIVE
             ? "Join the service in progress below."
-            : "Next service: Sabbath, 20 September 2026 · 11:00 AM"
+            : "Next service: Sabbath, 17 October 2026 · 11:00 AM"
         }
       />
 

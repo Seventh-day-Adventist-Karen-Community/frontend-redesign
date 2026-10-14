@@ -47,3 +47,17 @@ src/
 - Replace the map, hero, and media placeholders with real assets.
 - Wire the Giving page into the real M-Pesa flow.
 - Add a bulletin archive and an events calendar view.
+
+## Bulletin PDFs and the archive
+
+- The current weekly / monthly / quarterly / yearly bulletins each have a
+  `pdf` path in `src/data/bulletin.ts`; the page shows Download PDF and
+  Open in new tab buttons for them.
+- Past bulletins live in `src/data/archive.ts` and appear in the searchable
+  archive on `/bulletin` (search by title, theme, summary, date, or type;
+  filter by type and year).
+- To add one: put the PDF in `public/bulletins/` and add an entry to
+  `archive.ts` (or update the `pdf` path in `bulletin.ts` for the current
+  period).
+- The PDFs in `public/bulletins/` are generated samples — replace them with
+  the real files.
