@@ -19,6 +19,7 @@ export type InitiatedPayment = {
   id?: string;
   reference: string;
   externalReference?: string | null;
+  ResultCode?: number | null; // M-Pesa result code; 0 = OK
   state: PaymentState;
   ResultDescription: string;
 };

@@ -111,8 +111,27 @@ Things worth knowing:
   with HTTP 400.
 - Amounts are whole shillings only. The backend runs `int()` on each amount,
   so a decimal would crash it; the form blocks decimals.
-- After submitting, the page polls `initiatedPayment` every 3 seconds until it
-  is COMPLETED or FAILED (and shows a "still waiting" state after about two
-  minutes).
+- **A gift only counts as paid after the PIN response.** Starting the payment just
+  sends the prompt to the phone. The page then asks the backend every 3 seconds
+  and shows the thank-you screen only when `initiatedPayment` reports
+  `COMPLETED` with a clean result code (0 or none). `FAILED` (cancelled, wrong
+  PIN, expired) shows the failure; a contradictory answer is also treated as
+  failed. If nothing arrives within about 2 minutes, the page says "Payment
+  not confirmed" (never success) and offers "Check again". The decision logic is
+  in `src/lib/giving/status.ts`.
+- If M-Pesa rejects the request outright (non-zero code when starting), the
+  form shows the error straight away and nothing is polled.
+- For the PIN response to ever arrive, Safaricom must be able to reach the
+  backend's callback URL. On a local machine (127.0.0.1) it can't, so a real
+  payment will end as "not confirmed" even if the PIN was entered.
 - "Remember me" is not persisted yet.
 - The receipt page and the `transactions` query are not wired in this draft.
+
+## Housekeeping notes
+
+- The root `lib/`, `types/` and `utils/` folders are reference code from the
+  platform apps. The site doesn't import them, so `tsconfig.json` excludes them
+  from the build. Camp Meeting and ChurchConnect queries/mutations have been
+  removed from `lib/`.
+- `postcss.config.js` and `globals.css` use Tailwind v4, so `package.json`
+  declares `tailwindcss` v4 and `@tailwindcss/postcss`.

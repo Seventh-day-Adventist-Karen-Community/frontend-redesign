@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { FloatingInput, FloatingSelect, Toggle } from "@/components/GivingFields";
 import { giving, LIVE } from "@/lib/giving/api";
+import { MAX_POLLS, POLL_MS } from "@/lib/giving/config";
+import { interpretStatus } from "@/lib/giving/status";
 import type { ChurchUnit, PaymentType } from "@/lib/giving/types";
 
 /* ------------------------------------------------------------------ *
@@ -50,9 +52,6 @@ const PHONE_RE = /^(?:\+?254|0)?[17]\d{8}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const WHOLE_RE = /^\d+$/;
 
-const POLL_MS = LIVE ? 3000 : 1500;
-const MAX_POLLS = 40; // about two minutes at 3s
-
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -60,7 +59,11 @@ const fmt = (n: number) =>
 const amountError = (v?: string) =>
   v && v.trim() !== "" && !WHOLE_RE.test(v.trim()) ? "Enter whole shillings, e.g. 500" : "";
 
-type Phase = "processing" | "done" | "failed" | "timeout";
+// processing: waiting for the giver to enter their PIN and M-Pesa to answer
+// done:       M-Pesa confirmed the payment (the only path to the thank-you screen)
+// failed:     declined/cancelled/wrong PIN, OR no confirmation arrived in time
+type Phase = "processing" | "done" | "failed";
+type FailureKind = "declined" | "unconfirmed";
 
 export default function GivingPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -91,6 +94,7 @@ export default function GivingPage() {
   const [pollKey, setPollKey] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
   const [reference, setReference] = useState("");
+  const [failureKind, setFailureKind] = useState<FailureKind>("declined");
 
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -229,27 +233,42 @@ export default function GivingPage() {
 
       if (res.result) {
         failures = 0;
-        if (res.result.state === "COMPLETED") {
+        const outcome = interpretStatus(res.result);
+        if (outcome === "success") {
           setReference(res.result.reference);
           setResultMessage(res.result.ResultDescription);
           setPhase("done");
           return;
         }
-        if (res.result.state === "FAILED") {
-          setResultMessage(res.result.ResultDescription);
+        if (outcome === "failed") {
+          setFailureKind("declined");
+          // A COMPLETED status with a bad result code is a mixed signal: don't
+          // show a "processed successfully" message under a failure.
+          setResultMessage(
+            res.result.state === "COMPLETED"
+              ? "We couldn't confirm this payment."
+              : res.result.ResultDescription
+          );
           setPhase("failed");
           return;
         }
+        // "pending": still waiting for the PIN response, keep asking
       } else if (++failures >= 3) {
+        setFailureKind("unconfirmed");
         setResultMessage(res.errors?.[0]?.message ?? "We couldn't check your payment.");
         setPhase("failed");
         return;
       }
 
+      // No PIN response in time: report the payment as not confirmed. It is
+      // never shown as successful without a confirmation.
       if (attempts >= MAX_POLLS) {
-        setPhase("timeout");
+        setFailureKind("unconfirmed");
+        setResultMessage("");
+        setPhase("failed");
         return;
       }
+
       timer = setTimeout(tick, POLL_MS);
     };
 
@@ -530,50 +549,56 @@ export default function GivingPage() {
                 {phase === "failed" && (
                   <>
                     <XCircle size={64} className="text-red-500" />
-                    <p className="text-xl font-semibold text-red-600">
-                      {resultMessage || "The payment didn't go through."}
-                    </p>
-                    <p className="text-sm text-gray-500">No money was taken. You can try again.</p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPhase("processing");
-                        setStep(2);
-                      }}
-                      className={`${primaryBtn} mt-2`}
-                    >
-                      Try again
-                    </button>
+                    {failureKind === "declined" ? (
+                      <>
+                        <p className="text-xl font-semibold text-red-600">
+                          {resultMessage || "The payment didn't go through."}
+                        </p>
+                        <p className="text-sm text-gray-500">The payment was not completed. You can try again.</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPhase("processing");
+                            setStep(2);
+                          }}
+                          className={`${primaryBtn} mt-2`}
+                        >
+                          Try again
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xl font-semibold text-red-600">Payment not confirmed</p>
+                        <p className="text-sm text-gray-500">
+                          {resultMessage ||
+                            "We didn't receive your M-Pesa PIN confirmation, so this payment isn't complete."}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          If money was deducted from your M-Pesa, please don&apos;t pay again — check your M-Pesa
+                          messages or contact the church office.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPhase("processing");
+                            setPollKey((k) => k + 1);
+                          }}
+                          className={`${primaryBtn} mt-2`}
+                        >
+                          Check again
+                        </button>
+                        <button
+                          type="button"
+                          onClick={giveAgain}
+                          className="text-sm font-semibold text-maroon-700 hover:underline"
+                        >
+                          Start a new gift
+                        </button>
+                      </>
+                    )}
                     <Link href="/" className="text-sm font-semibold text-maroon-700 hover:underline">
                       Back home
                     </Link>
-                  </>
-                )}
-
-                {phase === "timeout" && (
-                  <>
-                    <Info size={56} className="text-maroon-600" />
-                    <p className="text-lg font-semibold text-gray-900">We&apos;re still waiting for confirmation.</p>
-                    <p className="text-sm text-gray-500">
-                      If you entered your M-Pesa PIN, you&apos;ll get an SMS shortly. You can also check again.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPhase("processing");
-                        setPollKey((k) => k + 1);
-                      }}
-                      className={`${primaryBtn} mt-2`}
-                    >
-                      Check again
-                    </button>
-                    <button
-                      type="button"
-                      onClick={giveAgain}
-                      className="text-sm font-semibold text-maroon-700 hover:underline"
-                    >
-                      Start a new gift
-                    </button>
                   </>
                 )}
               </div>

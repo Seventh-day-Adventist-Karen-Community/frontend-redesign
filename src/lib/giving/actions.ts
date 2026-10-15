@@ -4,6 +4,7 @@ import { apolloClient } from "@/lib/apollo/client";
 import { extractNodes, pkFromGlobalId } from "@/lib/graphql/helpers";
 import { CHURCH_UNITS, INITIATED_PAYMENT, PAYMENT_TYPES } from "@/lib/graphql/queries/giving";
 import { INITIATE_MPESA } from "@/lib/graphql/mutations/giving";
+import { promptWasSent } from "./status";
 import type {
   ChurchUnit,
   GivingRequest,
@@ -30,17 +31,43 @@ function messageFrom(e: any): string {
   );
 }
 
+// Server-side log that says what is wrong with the connection, so a bad
+// NEXT_PUBLIC_GRAPHQL_URL is obvious in the terminal.
+function logFailure(where: string, e: any) {
+  const net = e?.networkError;
+  let hint = "";
+  if (net?.statusCode) {
+    const isGraphql = typeof net.result === "object" && net.result?.errors;
+    hint = ` (HTTP ${net.statusCode}${
+      isGraphql ? "" : ": the server did not answer with GraphQL, so check NEXT_PUBLIC_GRAPHQL_URL"
+    })`;
+  } else if (net) {
+    hint = " (could not connect: check NEXT_PUBLIC_GRAPHQL_URL and that the backend is running)";
+  }
+  console.error(`[giving] ${where} failed${hint}: ${messageFrom(e)}`);
+}
+
 export async function getPaymentTypes(): Promise<PaymentType[]> {
-  const { data } = await apolloClient.query({ query: PAYMENT_TYPES });
-  return extractNodes<PaymentType>(data?.paymentTypes);
+  try {
+    const { data } = await apolloClient.query({ query: PAYMENT_TYPES });
+    return extractNodes<PaymentType>(data?.paymentTypes);
+  } catch (e) {
+    logFailure("getPaymentTypes", e);
+    throw e;
+  }
 }
 
 export async function getChurchUnits(): Promise<ChurchUnit[]> {
-  const { data } = await apolloClient.query({ query: CHURCH_UNITS });
-  return extractNodes<{ id: string; name: string }>(data?.churchUnits).flatMap((node) => {
-    const pk = pkFromGlobalId(node.id);
-    return pk === undefined ? [] : [{ id: node.id, name: node.name, pk }];
-  });
+  try {
+    const { data } = await apolloClient.query({ query: CHURCH_UNITS });
+    return extractNodes<{ id: string; name: string }>(data?.churchUnits).flatMap((node) => {
+      const pk = pkFromGlobalId(node.id);
+      return pk === undefined ? [] : [{ id: node.id, name: node.name, pk }];
+    });
+  } catch (e) {
+    logFailure("getChurchUnits", e);
+    throw e;
+  }
 }
 
 export async function initiatePayment(request: GivingRequest): Promise<InitiateResponse> {
@@ -73,13 +100,19 @@ export async function initiatePayment(request: GivingRequest): Promise<InitiateR
     const result: InitiatedPayment | undefined =
       data?.initiateMpesaExpressPayment?.initiateMpesaExpress;
     if (!result) return { errors: [{ message: "The payment could not be started. Please try again." }] };
+    // A non-zero code means M-Pesa did not accept the request: no PIN prompt
+    // reached the phone, so there is nothing to wait for.
+    if (!promptWasSent(result)) {
+      return {
+        errors: [{ message: result.ResultDescription || "M-Pesa could not send the payment prompt to your phone." }],
+      };
+    }
     return { result };
   } catch (e) {
     // Without this, a backend/GraphQL failure would crash the Server Action
     // as an unhandled 500 instead of reaching the form as a message.
-    const message = messageFrom(e);
-    console.error("[initiatePayment]", message);
-    return { errors: [{ message }] };
+    logFailure("initiatePayment", e);
+    return { errors: [{ message: messageFrom(e) }] };
   }
 }
 
@@ -93,6 +126,7 @@ export async function getPaymentStatus(id: string): Promise<StatusResponse> {
     if (!result) return { errors: [{ message: "A transaction with that reference was not found." }] };
     return { result };
   } catch (e) {
+    logFailure("getPaymentStatus", e);
     return { errors: [{ message: messageFrom(e) }] };
   }
 }

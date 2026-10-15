@@ -47,7 +47,7 @@ export async function initiatePayment(request: GivingRequest): Promise<InitiateR
   const id = btoa(`InitiateNode:${Date.now()}`);
   polls.set(id, 0);
   return {
-    result: { id, reference: `DRAFT${polls.size}`, state: "INITIATED", ResultDescription: "Success. Request accepted for processing" },
+    result: { id, reference: `DRAFT${polls.size}`, ResultCode: 0, state: "INITIATED", ResultDescription: "Success. Request accepted for processing" },
   };
 }
 
@@ -57,9 +57,9 @@ export async function getPaymentStatus(id: string): Promise<StatusResponse> {
   polls.set(id, n);
   const reference = `DRAFT-${id.slice(-6)}`;
   if (n < 3) {
-    return { result: { reference, state: "INITIATED", ResultDescription: "The service request is being processed." } };
+    return { result: { reference, ResultCode: 0, state: "INITIATED", ResultDescription: "The service request is being processed." } };
   }
   return {
-    result: { reference, state: "COMPLETED", ResultDescription: "The service request is processed successfully." },
+    result: { reference, ResultCode: 0, state: "COMPLETED", ResultDescription: "The service request is processed successfully." },
   };
 }

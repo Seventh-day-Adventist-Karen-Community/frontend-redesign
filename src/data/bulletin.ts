@@ -16,10 +16,10 @@ export const bulletins: Record<PeriodType, Bulletin> = {
   weekly: {
     periodType: "weekly",
     label: "This Week",
-    dateRange: "Spirit of Prophecy Sabbath, 17 October 2026",
+    dateRange: "Sabbath, 17 October 2026",
     orderOfService: [
       { time: "9:00 AM", item: "Sabbath School" },
-      { time: "11:00 AM", item: "Divine Service — Message: \"When Shall These Things Be?\"" },
+      { time: "11:00 AM", item: "Divine Service — Message: \"Believe and Live\"" },
       { time: "1:00 PM", item: "Fellowship Lunch" },
       { time: "4:00 PM", item: "Pathfinders Club" },
     ],

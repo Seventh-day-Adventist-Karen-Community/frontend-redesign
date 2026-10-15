@@ -1,13 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client/core";
 import { onError } from "@apollo/client/link/error";
-
-// One URL convention for the whole site: NEXT_PUBLIC_GRAPHQL_URL can be the
-// backend root ("http://host:8000") or the full endpoint
-// ("http://host:8000/graphql") — /graphql is added only when it's missing.
-export const graphqlEndpoint = (base = process.env.NEXT_PUBLIC_GRAPHQL_URL ?? "") => {
-  const trimmed = base.replace(/\/+$/, "");
-  return trimmed.endsWith("/graphql") ? trimmed : `${trimmed}/graphql`;
-};
+import { graphqlEndpoint } from "./endpoint";
 
 const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
   graphQLErrors?.forEach((e) => console.error(`[GraphQL] ${operation.operationName}: ${e.message}`));
