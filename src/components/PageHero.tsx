@@ -24,7 +24,7 @@ const PageHero = ({
         <span className="text-xs font-semibold uppercase tracking-wide text-maroon-100">
           {eyebrow}
         </span>
-        <h1 className="font-serif text-3xl sm:text-4xl mt-2">{title}</h1>
+        <h1 className="font-serif font-semibold text-3xl sm:text-4xl mt-2">{title}</h1>
         {description && (
           <p className="text-maroon-50/90 mt-3 max-w-xl leading-relaxed">{description}</p>
         )}

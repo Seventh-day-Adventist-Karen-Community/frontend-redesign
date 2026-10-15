@@ -15,7 +15,7 @@ export default function AboutPage() {
     <div>
       <PageHero
         eyebrow="About"
-        title="Karen Community SDA Church"
+        title="Seventh-day Adventist Church, Karen Community"
         description="A family of believers in Karen, Nairobi, worshipping together, growing in faith, and serving our community."
       />
 

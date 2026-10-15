@@ -1,11 +1,60 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+	/* Runtime Fonts from Next.js Layout */
+	/* --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+	--font-serif: var(--font-display), Georgia, serif; */
+
+	/* Custom Colors */
+	--color-cream: #FDF6F0;
+	--color-gold: #B8863B;
+
+	/* Red Scale */
+	--color-red: #ef4444;
+	--color-red-50: #fef2f2;
+	--color-red-100: #fee2e2;
+	--color-red-200: #fecaca;
+	--color-red-300: #fca5a5;
+	--color-red-400: #f87171;
+	--color-red-500: #ef4444;
+	--color-red-600: #dc2626;
+	--color-red-700: #b91c1c;
+	--color-red-800: #991b1b;
+	--color-red-900: #7f1d1d;
+	--color-red-950: #450a0a;
+
+	/* Yellow Scale */
+	--color-yellow: #eab308;
+	--color-yellow-50: #fefce8;
+	--color-yellow-100: #fef9c3;
+	--color-yellow-200: #fef08a;
+	--color-yellow-300: #fde047;
+	--color-yellow-400: #facc15;
+	--color-yellow-500: #eab308;
+	--color-yellow-600: #ca8a04;
+	--color-yellow-700: #a16207;
+	--color-yellow-800: #854d0e;
+	--color-yellow-900: #713f12;
+	--color-yellow-950: #422006;
+
+	/* Maroon Scale */
+	--color-maroon-50: #FBEEF0;
+	--color-maroon-100: #F5D6DA;
+	--color-maroon-200: #E9AEB5;
+	--color-maroon-300: #DA818C;
+	--color-maroon-400: #C85662;
+	--color-maroon-500: #A83240;
+	--color-maroon-600: #7A1F2B;
+	--color-maroon-700: #5E1620;
+	--color-maroon-800: #451017;
+	--color-maroon-900: #2E0A0F;
+	--color-maroon-950: #1A0508;
+}
 
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 body {
-  background-color: #fafafa;
+	background-color: #fafafa;
 }

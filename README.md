@@ -76,3 +76,43 @@ can have `classes`. Examples in `src/data/ministries.ts`:
 Ministries, groups and classes all accept an optional `image`, and groups and
 classes accept an `emblem`. See `public/ministries/README.txt`. The age ranges
 and class lists are draft content - confirm them with each department.
+
+## Giving page (/giving)
+
+Mirrors the real give-now flow in this site's theme: transparent header over a
+hero, a form card overlapping it, step 1 (name, phone, optional email and
+church unit, remember me) -> step 2 (Tithe and Local Church Budget always
+shown, other categories added on request, every amount optional) -> mock
+confirmation. A floating "How it works" button opens the M-Pesa instructions
+(bottom sheet on phones, dialog on larger screens).
+
+The floating-label fields live in `src/components/GivingFields.tsx`.
+
+### Connecting giving to the backend
+
+Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_GRAPHQL_URL` (either
+`http://127.0.0.1:8000` or `http://127.0.0.1:8000/graphql`). With it set, the
+page uses the live GraphQL backend; without it, the page runs on built-in
+sample data and no payment is made.
+
+```
+src/lib/apollo/client.ts               Apollo client (no caching - payment data is live)
+src/lib/graphql/helpers.ts             extractNodes, pkFromGlobalId
+src/lib/graphql/queries/giving.ts      PaymentTypes, ChurchUnits, initiatedPayment
+src/lib/graphql/mutations/giving.ts    initiateMpesaExpressPayment
+src/lib/giving/actions.ts              server actions the page calls
+src/lib/giving/mock.ts                 sample data used when no backend URL is set
+src/lib/giving/api.ts                  picks live or mock
+```
+
+Things worth knowing:
+- `unit` is an Int in the mutation: the church unit's raw pk, sent as a real
+  number (or null). The Relay `id` is decoded to get it. A string is rejected
+  with HTTP 400.
+- Amounts are whole shillings only. The backend runs `int()` on each amount,
+  so a decimal would crash it; the form blocks decimals.
+- After submitting, the page polls `initiatedPayment` every 3 seconds until it
+  is COMPLETED or FAILED (and shows a "still waiting" state after about two
+  minutes).
+- "Remember me" is not persisted yet.
+- The receipt page and the `transactions` query are not wired in this draft.

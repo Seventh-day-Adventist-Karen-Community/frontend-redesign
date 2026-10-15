@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+// @ts-ignore -- Next.js handles CSS imports at build time.
 import "./globals.css";
+import { Fraunces, Inter, Merriweather, Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const display = Fraunces({
+const display = Merriweather({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600"],
+  weight: ["300", "400", "700", "900"],
 });
 
-const body = Inter({
+const body = Montserrat({
   subsets: ["latin"],
   variable: "--font-body",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
