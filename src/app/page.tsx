@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { PlayCircle, MapPin, Clock, Calendar } from "lucide-react";
 import EventCard from "@/components/EventCard";
 import MinistryCard from "@/components/MinistryCard";
@@ -8,6 +7,8 @@ import { ministries } from "@/data/ministries";
 import { bulletins } from "@/data/bulletin";
 import { directionsUrl, location } from "@/data/location";
 import LocationMap from "@/components/LocationMap";
+import HeroCarousel from "@/components/HeroCarousel";
+import { heroSlides } from "@/data/hero";
 
 const glance = [
   {
@@ -39,64 +40,27 @@ export default function Home() {
 
   return (
     <div>
-      {/* Hero — full screen, with the transparent header (see Header.tsx)
-          floating over it. The source image already carries a dark wash on
-          the left where the text sits and the brand pattern showing through
-          on the right, so the overlay here just deepens that a touch rather
-          than flattening it. */}
-      <section className="relative min-h-screen flex items-end overflow-hidden text-white">
-        <Image
-          src="/hero-landing.png"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center -z-10"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-800/60 via-red-800/40 to-maroon-600/80 -z-10" />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 w-full py-28 pb-16">
-          {/* <p className="text-sm font-medium text-maroon-100/80">Karen, Nairobi · sdackc.org</p> */}
-          <h1 className="font-serif font-semibold text-4xl sm:text-6xl leading-tight mt-3 max-w-2xl">
-            Find Your People. <br /> Love Your Neighbor.
-          </h1>
-          <p className="mt-4 text-maroon-50/90 text-base sm:text-lg max-w-xl leading-relaxed">
-            God created us to need and know each other. But what does that look like? How do you build lasting friendships that make life better? Let’s find out in our new series, Find Your People, Love Your Neighbor.
-          </p>
-
-          <div className="flex flex-wrap gap-3 mt-8">
-            <Link
-              href="/live"
-              className="bg-white text-maroon-700 font-semibold px-6 py-3 rounded-full hover:bg-maroon-50 transition-colors"
-            >
-              Watch Live
-            </Link>
-            <Link
-              href="/bulletin"
-              className="bg-maroon-600/40 border border-white/30 text-white font-semibold px-6 py-3 rounded-full hover:bg-maroon-600/60 transition-colors"
-            >
-              This Week's Bulletin
-            </Link>
+      {/* Hero carousel — full screen, with the transparent header (see
+          Header.tsx) floating over it. Messages live in src/data/hero.ts;
+          the "This Sabbath" card stays put under whichever message shows. */}
+      <HeroCarousel slides={heroSlides}>
+        <div className="mt-12 bg-white/10 backdrop-blur border border-white/15 rounded-2xl p-5 sm:p-6 max-w-xl">
+          <div className="flex items-center gap-2 text-sm font-semibold text-maroon-50 mb-3">
+            <Calendar size={16} />
+            This Sabbath — {bulletins.weekly.dateRange}
           </div>
-
-          {/* This Sabbath module */}
-          <div className="mt-12 bg-white/10 backdrop-blur border border-white/15 rounded-2xl p-5 sm:p-6 max-w-xl">
-            <div className="flex items-center gap-2 text-sm font-semibold text-maroon-50 mb-3">
-              <Calendar size={16} />
-              This Sabbath — {bulletins.weekly.dateRange}
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3 text-sm">
-              {bulletins.weekly.orderOfService?.slice(0, 2).map((item) => (
-                <div key={item.item} className="flex items-center gap-2 text-maroon-50/90">
-                  <Clock size={14} className="shrink-0" />
-                  <span>
-                    <span className="font-semibold">{item.time}</span> — {item.item}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+            {bulletins.weekly.orderOfService?.slice(0, 2).map((item) => (
+              <div key={item.item} className="flex items-center gap-2 text-maroon-50/90">
+                <Clock size={14} className="shrink-0" />
+                <span>
+                  <span className="font-semibold">{item.time}</span> — {item.item}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </HeroCarousel>
 
       {/* This Week at a Glance */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">

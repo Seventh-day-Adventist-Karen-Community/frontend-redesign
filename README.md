@@ -135,3 +135,18 @@ Things worth knowing:
   removed from `lib/`.
 - `postcss.config.js` and `globals.css` use Tailwind v4, so `package.json`
   declares `tailwindcss` v4 and `@tailwindcss/postcss`.
+
+## Homepage hero carousel
+
+The full-screen hero rotates through the messages in `src/data/hero.ts`
+(headline, text, buttons, background image). Edit that file to change, add or
+remove messages; the component is `src/components/HeroCarousel.tsx`.
+
+- Auto-rotates every 8 seconds. Pauses while the mouse is over the text or
+  controls, while a control has keyboard focus, and from the pause button.
+  Reduced-motion users get no automatic rotation.
+- Controls sit at the bottom right: previous, pause/play, next, and progress
+  dots. Touch screens can swipe.
+- The background picture only cross-fades when the next message uses a
+  different `image`, so pictures change on occasion. Add photos to `/public`
+  and point more messages at them to rotate them more often.

@@ -1,5 +1,5 @@
 {
-  "name": "Karen Community SDA Church",
+  "name": "kcc-website-draft",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,26 +9,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.0",
-    "@tailwindcss/postcss": "^4.3.3",
-    "eslint-config-next": "^16.4.1",
-    "graphql": "^16.9.0",
-    "graphql-request": "^7.4.0",
-    "jose": "^6.2.12",
-    "jwt-decode": "^4.0.0",
+    "next": "14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "lucide-react": "^0.436.0",
-    "next": "^16.4.1",
-    "postcss-load-config": "^6.0.1",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "@apollo/client": "^3.13.0",
+    "graphql": "^16.9.0"
   },
   "devDependencies": {
-    "@types/node": "^20.19.43",
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.15",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.30",
-    "tailwindcss": "^4.3.3",
-    "typescript": "^5.5.4"
+    "tailwindcss": "^4.0.0",
+    "postcss": "^8.4.41",
+    "@tailwindcss/postcss": "^4.0.0",
+    "autoprefixer": "^10.4.20"
   }
 }
