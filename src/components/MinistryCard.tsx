@@ -23,13 +23,13 @@ const positionFor = (slug: string) => {
 const MinistryCard = ({ ministry }: { ministry: Ministry }) => {
   const href = `/ministries/${ministry.slug}`;
   const Icon = ministry.icon;
-  const sizes = "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw";
+  const sizes = "(min-width: 1024px) 25vw, 50vw";
 
   return (
-    <div className="group flex flex-col">
+    <div className="group flex flex-col m-1">
       <Link
         href={href}
-        className="relative block aspect-square overflow-hidden rounded-3xl shadow-md"
+        className="relative block aspect-square overflow-hidden rounded-2xl shadow-md sm:rounded-3xl"
       >
         {ministry.image ? (
           <>
@@ -40,8 +40,8 @@ const MinistryCard = ({ ministry }: { ministry: Ministry }) => {
               sizes={sizes}
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            <span className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-maroon-700 shadow">
-              <Icon size={20} />
+            <span className="absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-maroon-700 shadow sm:left-4 sm:top-4 sm:h-10 sm:w-10">
+              <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
             </span>
           </>
         ) : (
@@ -56,24 +56,24 @@ const MinistryCard = ({ ministry }: { ministry: Ministry }) => {
             />
             <div className="absolute inset-0 bg-gradient-to-br from-maroon-900/85 via-maroon-800/70 to-maroon-600/60" />
             <div className="absolute inset-0 flex items-center justify-center text-white">
-              <Icon size={64} strokeWidth={1.5} />
+              <Icon className="h-10 w-10 sm:h-16 sm:w-16" strokeWidth={1.5} />
             </div>
           </>
         )}
       </Link>
 
-      <h3 className="mt-5 text-lg font-bold text-maroon-700">{ministry.name}</h3>
-      <div className="mt-2 h-px w-8 bg-maroon-400" />
+      <h3 className="mt-3 text-base font-bold leading-snug text-maroon-700 sm:mt-5 sm:text-lg">{ministry.name}</h3>
+      <div className="mt-1.5 h-px w-8 bg-maroon-400 sm:mt-2" />
 
-      <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-gold">
+      <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-gold sm:mt-4 sm:text-xs">
         {ministry.audience}
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-gray-500">{ministry.summary}</p>
-      <div className="mt-3 flex flex-1 flex-wrap content-start gap-1.5">
+      <p className="mt-1.5 line-clamp-4 text-xs leading-relaxed text-gray-500 sm:mt-2 sm:line-clamp-none sm:text-sm">{ministry.summary}</p>
+      <div className="mt-2 flex flex-1 flex-wrap content-start gap-1 sm:mt-3 sm:gap-1.5">
         {ministry.groups?.map((group) => (
           <span
             key={group.slug}
-            className="rounded-full bg-maroon-50 px-2.5 py-1 text-[11px] font-medium text-maroon-700"
+            className="rounded-full bg-maroon-50 px-2 py-0.5 text-[10px] font-medium text-maroon-700 sm:px-2.5 sm:py-1 sm:text-[11px]"
           >
             {group.name}
           </span>
@@ -82,7 +82,7 @@ const MinistryCard = ({ ministry }: { ministry: Ministry }) => {
 
       <Link
         href={href}
-        className="mt-5 self-start rounded-full border border-maroon-700 px-5 py-2 text-sm font-semibold text-maroon-700 transition-colors hover:bg-maroon-700 hover:text-white"
+        className="mt-4 self-start rounded-full border border-maroon-700 px-4 py-1.5 text-xs font-semibold text-maroon-700 transition-colors hover:bg-maroon-700 hover:text-white sm:mt-5 sm:px-5 sm:py-2 sm:text-sm"
       >
         View Ministry
       </Link>

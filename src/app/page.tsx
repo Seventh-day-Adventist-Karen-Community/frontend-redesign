@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { PlayCircle, MapPin, Clock, Calendar } from "lucide-react";
 import EventCard from "@/components/EventCard";
-import MinistryCard from "@/components/MinistryCard";
+import MinistriesPager from "@/components/MinistriesPager";
 import { events } from "@/data/events";
-import { ministries } from "@/data/ministries";
 import { bulletins } from "@/data/bulletin";
 import { directionsUrl, location } from "@/data/location";
 import LocationMap from "@/components/LocationMap";
@@ -121,11 +120,7 @@ export default function Home() {
             Every member has a place to grow, serve, and belong.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
-          {ministries.slice(0, 8).map((ministry) => (
-            <MinistryCard key={ministry.slug} ministry={ministry} />
-          ))}
-        </div>
+        <MinistriesPager />
       </section>
 
       {/* Giving banner */}

@@ -150,3 +150,15 @@ remove messages; the component is `src/components/HeroCarousel.tsx`.
 - The background picture only cross-fades when the next message uses a
   different `image`, so pictures change on occasion. Add photos to `/public`
   and point more messages at them to rotate them more often.
+
+## Ministries on the homepage, and the full bulletin archive
+
+- The homepage shows ministries four at a time (`src/components/MinistriesPager.tsx`,
+  change `pageSize` to alter it) with previous/next and page dots, plus a
+  "View all ministries" link. On phones the ministry cards are two columns wide,
+  on the homepage and on `/ministries`.
+- `/bulletin` shows the five most recent past bulletins and a "View full
+  archive" button. Its search box sends visitors to `/bulletin/archive?q=...`.
+- `/bulletin/archive` lists every past bulletin, grouped by year (newest first),
+  with search, type filters and a year filter. New bulletins go into
+  `src/data/archive.ts` and appear in both places automatically.

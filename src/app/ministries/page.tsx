@@ -13,7 +13,7 @@ export default function MinistriesPage() {
 
       <div className="bg-cream">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-6 sm:gap-y-14 lg:grid-cols-4">
             {ministries.map((ministry) => (
               <MinistryCard key={ministry.slug} ministry={ministry} />
             ))}

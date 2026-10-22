@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Clock, Download, ExternalLink, FileText, Search, X } from "lucide-react";
+import { useState } from "react";
+import Link from "next/link";
+import { Clock, Download, ExternalLink, Search } from "lucide-react";
 import { bulletins, PeriodType } from "@/data/bulletin";
 import { archive } from "@/data/archive";
 import PageHero from "@/components/PageHero";
+import ArchiveRow from "@/components/ArchiveRow";
 
 const TABS: { key: PeriodType; label: string }[] = [
   { key: "weekly", label: "Weekly" },
@@ -13,14 +15,8 @@ const TABS: { key: PeriodType; label: string }[] = [
   { key: "yearly", label: "Yearly" },
 ];
 
-const TYPE_LABEL: Record<PeriodType, string> = {
-  weekly: "Weekly",
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-  yearly: "Yearly",
-};
-
-const PAGE_SIZE = 8;
+// How many of the most recent past bulletins to show here; the rest live on the archive page.
+const RECENT_COUNT = 5;
 
 const chip = (active: boolean) =>
   `px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
@@ -34,44 +30,7 @@ export default function BulletinPage() {
   const [tab, setTab] = useState<PeriodType>("weekly");
   const bulletin = bulletins[tab];
 
-  // Archive
-  const [query, setQuery] = useState("");
-  const [type, setType] = useState<PeriodType | "all">("all");
-  const [year, setYear] = useState("all");
-  const [visible, setVisible] = useState(PAGE_SIZE);
-
-  const years = useMemo(
-    () => Array.from(new Set(archive.map((a) => a.date.slice(0, 4)))).sort().reverse(),
-    []
-  );
-
-  const counts = useMemo(() => {
-    const c: Record<string, number> = { all: archive.length };
-    archive.forEach((a) => (c[a.periodType] = (c[a.periodType] || 0) + 1));
-    return c;
-  }, []);
-
-  const results = useMemo(() => {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    return archive.filter((a) => {
-      if (type !== "all" && a.periodType !== type) return false;
-      if (year !== "all" && !a.date.startsWith(year)) return false;
-      if (terms.length === 0) return true;
-      const haystack = [a.title, a.theme, a.summary, a.dateLabel, a.periodType, a.date.slice(0, 4)]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return terms.every((t) => haystack.includes(t));
-    });
-  }, [query, type, year]);
-
-  const filtersActive = query !== "" || type !== "all" || year !== "all";
-  const clearFilters = () => {
-    setQuery("");
-    setType("all");
-    setYear("all");
-    setVisible(PAGE_SIZE);
-  };
+  const recent = archive.slice(0, RECENT_COUNT);
 
   return (
     <div>
@@ -159,153 +118,47 @@ export default function BulletinPage() {
         </div>
       </div>
 
-      {/* Archive */}
+      {/* Recent past bulletins; everything else is on the archive page */}
       <section className="bg-cream" id="archive">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
           <span className="text-xs font-semibold uppercase tracking-wider text-gold">Archive</span>
           <h2 className="font-serif text-2xl sm:text-3xl mt-2">Past bulletins</h2>
           <p className="text-gray-500 mt-2">
-            Search by date, theme, or keyword — for example &ldquo;baptism&rdquo;, &ldquo;camp
-            meeting&rdquo;, or &ldquo;September 2026&rdquo;.
+            The most recent ones are below. Looking for something older? Search the full archive.
           </p>
 
-          <div className="relative mt-6">
+          {/* Plain GET form: lands on the archive page with the search filled in */}
+          <form action="/bulletin/archive" method="get" role="search" className="relative mt-6">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="search"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setVisible(PAGE_SIZE);
-              }}
-              placeholder="Search past bulletins"
-              aria-label="Search past bulletins"
-              className="w-full rounded-full border-2 border-gray-200 bg-white pl-11 pr-11 py-3 text-sm focus:outline-none focus:border-maroon-500"
+              name="q"
+              placeholder="Search all past bulletins"
+              aria-label="Search all past bulletins"
+              className="w-full rounded-full border-2 border-gray-200 bg-white py-3 pl-11 pr-28 text-sm focus:border-maroon-500 focus:outline-none"
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery("");
-                  setVisible(PAGE_SIZE);
-                }}
-                aria-label="Clear search"
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-maroon-600"
-              >
-                <X size={18} />
-              </button>
-            )}
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {(["all", "weekly", "monthly", "quarterly", "yearly"] as const).map((key) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setType(key);
-                  setVisible(PAGE_SIZE);
-                }}
-                className={chip(type === key)}
-              >
-                {key === "all" ? "All" : TYPE_LABEL[key]}
-                <span className="ml-1.5 opacity-70">{counts[key] || 0}</span>
-              </button>
-            ))}
-            <select
-              value={year}
-              onChange={(e) => {
-                setYear(e.target.value);
-                setVisible(PAGE_SIZE);
-              }}
-              aria-label="Filter by year"
-              className="ml-auto rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-600 focus:outline-none focus:border-maroon-500"
+            <button
+              type="submit"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-maroon-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-maroon-700"
             >
-              <option value="all">All years</option>
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
+              Search
+            </button>
+          </form>
 
-          <p className="mt-5 text-xs text-gray-500" aria-live="polite">
-            Showing {Math.min(visible, results.length)} of {results.length}{" "}
-            {results.length === 1 ? "bulletin" : "bulletins"}
-          </p>
-
-          <ul className="mt-3 space-y-3">
-            {results.slice(0, visible).map((item) => (
-              <li
-                key={item.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4"
-              >
-                <div className="flex items-start gap-4 min-w-0 flex-1">
-                  <div className="shrink-0 w-11 h-11 rounded-xl bg-maroon-50 text-maroon-600 flex items-center justify-center">
-                    <FileText size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-x-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-gold">
-                        {TYPE_LABEL[item.periodType]}
-                      </span>
-                      <span className="text-xs text-gray-400">{item.dateLabel}</span>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 leading-snug">{item.title}</h3>
-                    {item.theme && (
-                      <p className="text-sm text-maroon-700 font-medium">{item.theme}</p>
-                    )}
-                    <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{item.summary}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  <a
-                    href={item.pdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 border border-maroon-700 text-maroon-700 hover:bg-maroon-700 hover:text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors"
-                  >
-                    <ExternalLink size={14} /> View
-                  </a>
-                  <a
-                    href={item.pdf}
-                    download
-                    className="inline-flex items-center gap-1.5 bg-maroon-600 hover:bg-maroon-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors"
-                  >
-                    <Download size={14} /> PDF{item.size ? ` · ${item.size}` : ""}
-                  </a>
-                </div>
-              </li>
+          <ul className="mt-6 space-y-3">
+            {recent.map((item) => (
+              <ArchiveRow key={item.id} item={item} />
             ))}
           </ul>
 
-          {results.length === 0 && (
-            <div className="mt-3 bg-white rounded-2xl border border-gray-100 p-8 text-center">
-              <p className="text-sm text-gray-600">No bulletins match your search.</p>
-              <p className="text-xs text-gray-400 mt-1">
-                Try a different word, or clear the filters.
-              </p>
-              {filtersActive && (
-                <button
-                  onClick={clearFilters}
-                  className="mt-4 text-sm font-semibold text-maroon-700 hover:underline"
-                >
-                  Clear search and filters
-                </button>
-              )}
-            </div>
-          )}
-
-          {results.length > visible && (
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setVisible((v) => v + PAGE_SIZE)}
-                className="rounded-full border border-maroon-700 px-6 py-2.5 text-sm font-semibold text-maroon-700 hover:bg-maroon-700 hover:text-white transition-colors"
-              >
-                Show more
-              </button>
-            </div>
-          )}
+          <div className="mt-8 text-center">
+            <Link
+              href="/bulletin/archive"
+              className="inline-flex items-center gap-2 rounded-full border border-maroon-700 px-6 py-2.5 text-sm font-semibold text-maroon-700 transition-colors hover:bg-maroon-700 hover:text-white"
+            >
+              View full archive ({archive.length} bulletins) →
+            </Link>
+          </div>
         </div>
       </section>
     </div>
