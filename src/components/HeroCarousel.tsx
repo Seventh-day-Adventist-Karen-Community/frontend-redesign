@@ -71,7 +71,7 @@ export default function HeroCarousel({
             role="region"
             aria-roledescription="carousel"
             aria-label="Featured messages"
-            className="relative isolate flex min-h-screen items-end overflow-hidden text-white"
+            className="relative isolate flex min-h-dvh items-end overflow-hidden text-white"
             onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
             onTouchEnd={(e) => {
                 if (touchStartX.current === null) return;
